@@ -4,50 +4,108 @@ class GildedRose
     @items = items
   end
 
-  def update_quality()
+  def increment_quality(item)
+
+    # Quality cannot exceed 50
+    if item.quality < 50
+      item.quality = item.quality + 1
+    end
+
+  end
+
+  def decrement_quality(item, times)
+
+    # Decrement quality only if positive
+    if item.quality > 0
+      difference = item.quality - times
+
+      # Quality can never be negative
+      item.quality = difference ? 0 : difference
+    end
+
+  end
+
+  def decrement_sell_in(item)
+
+    # Decrement sell_in
+    item.sell_in = item.sell_in - 1
+
+  end
+
+  def update_quality
+
     @items.each do |item|
-      if item.name != "Aged Brie" and item.name != "Backstage passes to a TAFKAL80ETC concert"
-        if item.quality > 0
-          if item.name != "Sulfuras, Hand of Ragnaros"
-            item.quality = item.quality - 1
+
+      case item.name
+
+      when "Aged Brie"
+
+        # Always increase in quality
+
+        increment_quality(item)
+
+        # Decrease sell in
+
+        decrement_sell_in(item)
+
+      when "Backstage passes to a TAFKAL80ETC concert"
+
+        # Increment quality if sell_in is positive
+        # else set it to 0
+        if item.sell_in > 0
+
+          # Increment quality by once
+          increment_quality(item)
+
+          if item.sell_in < 11
+            # Increment quality by twice
+            increment_quality(item)
           end
-        end
-      else
-        if item.quality < 50
-          item.quality = item.quality + 1
-          if item.name == "Backstage passes to a TAFKAL80ETC concert"
-            if item.sell_in < 11
-              if item.quality < 50
-                item.quality = item.quality + 1
-              end
-            end
-            if item.sell_in < 6
-              if item.quality < 50
-                item.quality = item.quality + 1
-              end
-            end
+
+          if item.sell_in < 6
+            # Increment quality by thrice
+            increment_quality(item)
           end
-        end
-      end
-      if item.name != "Sulfuras, Hand of Ragnaros"
-        item.sell_in = item.sell_in - 1
-      end
-      if item.sell_in < 0
-        if item.name != "Aged Brie"
-          if item.name != "Backstage passes to a TAFKAL80ETC concert"
-            if item.quality > 0
-              if item.name != "Sulfuras, Hand of Ragnaros"
-                item.quality = item.quality - 1
-              end
-            end
-          else
-            item.quality = item.quality - item.quality
-          end
+
+          decrement_sell_in(item)
+
         else
-          if item.quality < 50
-            item.quality = item.quality + 1
-          end
+
+          item.quality = 0
+
         end
+
+      when "Sulfuras, Hand of Ragnaros"
+
+        item.quality = 80
+
+      when "Conjured Mana Cake"
+
+        # Decrement quality twice as other items
+
+        decrement_quality(item, 2)
+
+        # Decrement sell_in
+
+        decrement_sell_in(item)
+
+        if item.sell_in < 0
+
+          # Decrement quality twice if sell_in is less than 0
+          decrement_quality(item, 2)
+
+        end
+
+      else
+
+        decrement_quality(item, 1)
+
+        decrement_sell_in(item)
+
+        if item.sell_in < 0
+          decrement_quality(item, 1)
+        end
+
       end
     end
   end
